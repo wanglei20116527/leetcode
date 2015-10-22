@@ -1,103 +1,47 @@
+/**
+ * @param {character[][]} matrix
+ * @return {number}
+ */
 var maximalSquare = function(matrix) {
-	if( matrix.length == 0 ){
-		return 0;
-	}
-	var lengthX = matrix.length;
-	var lengthY = matrix[0].length;
-
-	var length   = Math.min( lengthX, lengthY );
-	var array    = new Array( length );
-	var position = new Array( length );
-	for( var i = 0; i < length; ++i ){
-		array[i] = 0;
-		position[i] = new Array(2);
-	}
-
-	if( lengthX <= lengthY ){
-		for( var i = 0; i < lengthX; ++i ){
-			var count      = 0;
-			var startIndex = 0;
-			var endIndex   = 0;
-			for( var j = 0; j < lengthY; ++j ){
-				if( matrix[i][j] == 1 ){
-					count++;
-					endIndex = j;
-				}else{
-					if( count > array[i] ){
-						array[i] = count;
-						position[i][0] = startIndex;
-						position[i][1] = endIndex;
- 					}
-					count = 0;
-					startIndex = j + 1;
-				}
-			}
-
-			if( count > array[i] ){
-				array[i] = count;
-				position[i][0] = startIndex;
-				position[i][1] = endIndex;
- 			}
-		}
-
-	}else{
-		for( var i = 0; i < lengthY; ++i ){
-			var count      = 0;
-			var startIndex = 0;
-			var endIndex   = 0;
-			for( var j = 0; j < lengthX; ++j ){
-				if( matrix[j][i] == 1 ){
-					count++;
-					endIndex = j;
-				}else{
-					if( count > array[i] ){
-						array[i] = count;
-						position[i][0] = startIndex;
-						position[i][1] = endIndex;
-					}
-					count = 0;
-					startIndex = j + 1;
-				}
-			}
-			if( count > array[i] ){
-				array[i] = count;
-				position[i][0] = startIndex;
-				position[i][1] = endIndex;
- 			}
-		}
-	}
-
-	var max = 0;
-	for( var i = 0; i < length; ++i ){
-		max = Math.max( max, array[i] );
-	}
-
-	for( var i = max; i >= 1; --i ){
-		debugger;
-		for( var j = 0; j < length; ++j ){
-			if( array[j] >= i && j + i <= length ){
-
-				var count = 1;
-				var maxStartIndex = position[j][0];
-				var minEndIndex   = position[j][1];
-
-				while( count <= i ){
-					if( array[j + count] >= i ){
-						maxStartIndex = Math.max(maxStartIndex , position[j + count][0] );
-						minEndIndex   = Math.min(minEndIndex   , position[j + count][1] );
-						count++;
-					}else{
-						break;
-					}
-				}
-
-				if( count == i && minEndIndex - maxStartIndex + 1 >= i ){
-					return i * i;
-				}
-			}
-		}
-	}
-
-	return 0;
-
+    if( matrix == null || matrix.length == 0 || matrix[0].length == 0 ){
+        return 0;
+    }
+    
+    var row = matrix.length;
+    var col = matrix[0].length;
+    
+    var sides = [];
+    for(var i = 0; i < row; ++i){
+        sides[i] = (matrix[i][0] == '0') ? [0] : [1];
+    }
+    
+    for(var i = 0; i < col; ++i){
+        sides[0][i] = (matrix[0][i] == '0') ? 0 : 1;
+    }
+    
+    var result = 0;
+    for(var i = 0; i < col; ++i){
+        if(sides[0][i] == 1){
+            result = 1;
+            break;
+        }
+    }
+    
+    for(var i = 1; i < row; ++i){
+        for(var j = 1; j < col; ++j){
+            if( matrix[i][j] == '1' ){
+                sides[i][j] = Math.min( sides[i - 1][j], sides[i][j - 1], sides[i - 1][j - 1] ) + 1;
+            }else{
+                sides[i][j] = 0;
+            }
+           
+            
+            if( result < sides[i][j] ){
+                result = sides[i][j]
+            }
+        }
+    }
+    
+    return result * result;
+    
 };
